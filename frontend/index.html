@@ -133,7 +133,7 @@
     <div class="hero-slide active" style="width:100%;min-height:100vh;display:flex;align-items:center;background:var(--cream);padding-top:var(--nav-height);position:relative;overflow:hidden;">
       <div style="position:absolute;right:0;top:0;width:52%;height:100%;z-index:0;">
         <div style="position:absolute;right:-5%;top:-5%;width:100%;height:110%;background:var(--beige);clip-path:polygon(15% 0, 100% 0, 100% 100%, 0% 100%);z-index:-1;"></div>
-        <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1200&q=80" alt="Milano Sofa" style="width:100%;height:100%;object-fit:cover;object-position:center;" onerror="this.style.display='none'">
+        <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1200&q=80" alt="Milano Sofa" style="width:100%;height:100%;object-fit:cover;object-position:center;" onerror="this.style.background='#c8b89a'">
       </div>
       <div class="container" style="position:relative;z-index:1;width:100%;">
         <div class="hero-content">
@@ -182,7 +182,7 @@
     <!-- Slide 3 -->
     <div class="hero-slide" style="width:100%;min-height:100vh;display:none;align-items:center;background:var(--cream);padding-top:var(--nav-height);position:relative;overflow:hidden;">
       <div style="position:absolute;left:0;top:0;width:52%;height:100%;">
-        <img src="https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=1200&q=80" alt="Office" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
+        <img src="https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=1200&q=80" alt="Office" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.background='#c8b89a'">
       </div>
       <div class="container" style="position:relative;z-index:1;width:100%;display:flex;justify-content:flex-end;">
         <div class="hero-content" style="text-align:right;align-items:flex-end;max-width:540px;">
@@ -500,7 +500,7 @@
         const grid = document.getElementById('categoriesGrid');
         grid.innerHTML = data.categories.map(cat => `
           <div class="category-card" onclick="window.location='./pages/products.html?category=${cat.slug}'">
-            <img src="${catImages[cat.slug] || cat.image_url || 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400'}" alt="${cat.name}" loading="lazy" onerror="this.style.display='none'">
+            <img src="${catImages[cat.slug] || cat.image_url || 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400'}" alt="${cat.name}" loading="lazy" onerror="this.style.background='#c8b89a'">
             <div class="category-overlay">
               <div class="category-name">${cat.name}</div>
               <div class="category-count">${cat.product_count} items</div>
