@@ -2,7 +2,7 @@
 // Echo-Furniture Global JS Utilities
 // ============================================================
 
-const API_BASE = 'https://echo-furniture.onrender.com/api';
+const API_BASE = 'https://echo-furniture1.onrender.com/api';
 
 // ============================================================
 // Smart Path Resolver
