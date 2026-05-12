@@ -1,0 +1,13 @@
+{
+  "name": "echo-furniture",
+  "version": "1.0.0",
+  "description": "Premium Furniture E-Commerce Platform",
+  "scripts": {
+    "install:backend": "cd backend && npm install",
+    "start:backend": "cd backend && npm start",
+    "dev:backend": "cd backend && npm run dev"
+  },
+  "keywords": ["furniture", "ecommerce", "nodejs", "express", "mysql"],
+  "author": "Echo Furniture",
+  "license": "MIT"
+}

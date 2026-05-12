@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Wishlist — Echo Furniture</title>
+  <link rel="stylesheet" href="../styles/main.css"/>
+</head>
+<body>
+<nav class="navbar" id="navbar"></nav>
+<div class="page-wrapper">
+  <div class="page-header">
+    <div class="container">
+      <div class="breadcrumb" style="margin-bottom:12px;"><a href="../index.html">Home</a><span>/</span><span>Wishlist</span></div>
+      <h1>My Wishlist</h1>
+    </div>
+  </div>
+  <div class="container" style="padding-bottom:80px;">
+    <div id="wishlistLoading"><div class="spinner"></div></div>
+    <div id="wishlistContent" style="display:none;"></div>
+  </div>
+</div>
+<div id="footer"></div>
+<script src="../scripts/main.js"></script>
+<script>
+  if (!auth.isLoggedIn()) window.location.href = './login.html';
+
+  async function loadWishlist() {
+    try {
+      const data = await api.get('/wishlist');
+      document.getElementById('wishlistLoading').style.display = 'none';
+      document.getElementById('wishlistContent').style.display = 'block';
+      if (!data.wishlist.length) {
+        document.getElementById('wishlistContent').innerHTML = `
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+            <h3>Your wishlist is empty</h3>
+            <p>Save items you love and come back to them anytime.</p>
+            <a href="./products.html" class="btn btn-primary">Browse Products</a>
+          </div>`;
+        return;
+      }
+      document.getElementById('wishlistContent').innerHTML = `
+        <p style="color:var(--warm-gray);margin-bottom:24px;">${data.wishlist.length} item${data.wishlist.length>1?'s':''} saved</p>
+        <div class="products-grid">
+          ${data.wishlist.map(item => buildProductCard({...item, id: item.product_id, category_name:'', review_count:0})).join('')}
+        </div>`;
+    } catch (err) {
+      document.getElementById('wishlistLoading').innerHTML = `<p style="color:var(--error);text-align:center;">${err.message}</p>`;
+    }
+  }
+  loadWishlist();
+</script>
+</body>
+</html>

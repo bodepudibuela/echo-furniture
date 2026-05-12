@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Checkout — Echo Furniture</title>
+  <link rel="stylesheet" href="../styles/main.css"/>
+  <style>
+    .checkout-progress { display:flex; align-items:center; gap:0; margin-bottom:40px; }
+    .progress-step { display:flex; align-items:center; gap:8px; font-size:0.82rem; }
+    .progress-step-num { width:28px; height:28px; border-radius:50%; background:var(--beige); color:var(--warm-gray); display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:600; transition:var(--transition); }
+    .progress-step.active .progress-step-num { background:var(--dark); color:white; }
+    .progress-step.done .progress-step-num { background:var(--success); color:white; }
+    .progress-step-label { color:var(--warm-gray); transition:var(--transition); }
+    .progress-step.active .progress-step-label { color:var(--dark); font-weight:500; }
+    .progress-line { flex:1; height:1px; background:var(--beige); margin:0 12px; }
+
+    .address-card { border:1.5px solid var(--beige); border-radius:8px; padding:18px; cursor:pointer; transition:var(--transition); margin-bottom:12px; display:flex; align-items:flex-start; gap:12px; }
+    .address-card:hover { border-color:var(--sand); }
+    .address-card.selected { border-color:var(--accent); background:rgba(139,105,20,0.03); }
+    .address-card input[type="radio"] { accent-color:var(--accent); margin-top:3px; flex-shrink:0; }
+    .address-label { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; font-weight:600; color:var(--accent); margin-bottom:4px; }
+    .address-text { font-size:0.88rem; color:var(--charcoal); line-height:1.6; }
+
+    .payment-option { border:1.5px solid var(--beige); border-radius:8px; padding:16px 18px; cursor:pointer; transition:var(--transition); margin-bottom:10px; display:flex; align-items:center; gap:14px; }
+    .payment-option:hover { border-color:var(--sand); }
+    .payment-option.selected { border-color:var(--accent); background:rgba(139,105,20,0.03); }
+    .payment-option input[type="radio"] { accent-color:var(--accent); }
+    .payment-option-icon { width:40px; height:28px; background:var(--cream); border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:0.65rem; font-weight:600; color:var(--charcoal); flex-shrink:0; }
+    .payment-option-name { font-weight:500; font-size:0.9rem; }
+    .payment-option-desc { font-size:0.75rem; color:var(--warm-gray); margin-top:2px; }
+
+    .card-fields { padding:16px; background:var(--cream); border-radius:6px; margin-top:12px; }
+
+    .order-item-row { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--beige); }
+    .order-item-img { width:52px; height:44px; object-fit:cover; border-radius:4px; background:var(--cream); flex-shrink:0; }
+    .order-item-name { flex:1; font-size:0.85rem; font-weight:500; min-width:0; }
+    .order-item-qty { font-size:0.75rem; color:var(--warm-gray); }
+    .order-item-price { font-size:0.9rem; font-weight:600; white-space:nowrap; }
+
+    /* Success screen */
+    .order-success { text-align:center; padding:60px 24px; }
+    .success-icon { width:80px; height:80px; background:#D1FAE5; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 24px; }
+    .success-icon svg { width:36px; height:36px; color:var(--success); stroke-width:2; }
+    .order-number-badge { display:inline-block; padding:10px 24px; background:var(--cream); border:1px solid var(--sand); border-radius:100px; font-size:0.9rem; font-weight:600; color:var(--dark); margin:16px 0; }
+
+    @media (max-width:768px) {
+      .checkout-layout { grid-template-columns:1fr; }
+      .checkout-progress { display:none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar" id="navbar"></nav>
+
+<div class="page-wrapper">
+  <div class="page-header">
+    <div class="container">
+      <h1>Checkout</h1>
+      <div class="checkout-progress" style="margin-top:24px;max-width:500px;">
+        <div class="progress-step active" id="step1">
+          <div class="progress-step-num">1</div>
+          <span class="progress-step-label">Delivery</span>
+        </div>
+        <div class="progress-line"></div>
+        <div class="progress-step" id="step2">
+          <div class="progress-step-num">2</div>
+          <span class="progress-step-label">Payment</span>
+        </div>
+        <div class="progress-line"></div>
+        <div class="progress-step" id="step3">
+          <div class="progress-step-num">3</div>
+          <span class="progress-step-label">Review</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container" style="padding-bottom:80px;">
+
+    <!-- Success Screen -->
+    <div id="successScreen" style="display:none;">
+      <div class="order-success">
+        <div class="success-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h2 style="font-family:var(--font-display);font-size:2.5rem;font-weight:300;margin-bottom:10px;">Order Confirmed!</h2>
+        <p style="color:var(--warm-gray);font-size:1rem;margin-bottom:4px;">Thank you for shopping with Echo Furniture.</p>
+        <p style="color:var(--warm-gray);font-size:0.9rem;">A confirmation email has been sent to your registered address.</p>
+        <div class="order-number-badge" id="successOrderNum"></div>
+        <p style="font-size:0.85rem;color:var(--warm-gray);margin-bottom:32px;" id="successDelivery"></p>
+        <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+          <a href="./orders.html" class="btn btn-primary btn-lg">Track My Order</a>
+          <a href="./products.html" class="btn btn-outline btn-lg">Continue Shopping</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Checkout Form -->
+    <div id="checkoutForm">
+      <div class="checkout-layout">
+        <!-- Left -->
+        <div>
+
+          <!-- STEP 1: Address -->
+          <div class="checkout-step" id="addressStep">
+            <div class="step-header">
+              <div class="step-number">1</div>
+              <h2 class="step-title">Delivery Address</h2>
+            </div>
+            <div id="savedAddresses"></div>
+            <button class="btn btn-ghost" onclick="showAddressForm()" id="addAddressBtn" style="margin-top:4px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add New Address
+            </button>
+
+            <!-- New address form -->
+            <div id="newAddressForm" style="display:none;background:var(--cream);border-radius:8px;padding:24px;margin-top:16px;">
+              <h4 style="font-family:var(--font-display);font-size:1.2rem;margin-bottom:16px;">New Address</h4>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                <div class="form-group"><label class="form-label">Full Name*</label><input class="form-input" id="addrName" placeholder="Name for delivery"></div>
+                <div class="form-group"><label class="form-label">Phone*</label><input class="form-input" id="addrPhone" placeholder="+91 98765 43210"></div>
+              </div>
+              <div class="form-group"><label class="form-label">Address Line 1*</label><input class="form-input" id="addrLine1" placeholder="House / Flat / Building"></div>
+              <div class="form-group"><label class="form-label">Address Line 2</label><input class="form-input" id="addrLine2" placeholder="Street / Area / Landmark"></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;">
+                <div class="form-group"><label class="form-label">City*</label><input class="form-input" id="addrCity" placeholder="City"></div>
+                <div class="form-group"><label class="form-label">State*</label><input class="form-input" id="addrState" placeholder="State"></div>
+                <div class="form-group"><label class="form-label">Pincode*</label><input class="form-input" id="addrPostal" placeholder="600001"></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+                <input type="checkbox" id="addrDefault" style="accent-color:var(--accent);width:15px;height:15px;">
+                <label for="addrDefault" style="font-size:0.85rem;cursor:pointer;">Set as default address</label>
+              </div>
+              <div style="display:flex;gap:12px;">
+                <button class="btn btn-primary" onclick="saveAddress()">Save Address</button>
+                <button class="btn btn-ghost" onclick="hideAddressForm()">Cancel</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 2: Payment -->
+          <div class="checkout-step">
+            <div class="step-header">
+              <div class="step-number">2</div>
+              <h2 class="step-title">Payment Method</h2>
+            </div>
+            <div id="paymentOptions">
+              <div class="payment-option selected" onclick="selectPayment('upi', this)">
+                <input type="radio" name="payment" value="upi" checked>
+                <div class="payment-option-icon">UPI</div>
+                <div><div class="payment-option-name">UPI Payment</div><div class="payment-option-desc">Pay via GPay, PhonePe, Paytm, BHIM</div></div>
+              </div>
+              <div class="payment-option" onclick="selectPayment('credit_card', this)">
+                <input type="radio" name="payment" value="credit_card">
+                <div class="payment-option-icon">CARD</div>
+                <div><div class="payment-option-name">Credit / Debit Card</div><div class="payment-option-desc">Visa, Mastercard, RuPay, Amex</div></div>
+              </div>
+              <div id="cardFields" class="card-fields" style="display:none;">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                  <div class="form-group" style="grid-column:1/-1;"><label class="form-label">Card Number</label><input class="form-input" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCardNumber(this)"></div>
+                  <div class="form-group"><label class="form-label">Expiry</label><input class="form-input" placeholder="MM / YY" maxlength="7"></div>
+                  <div class="form-group"><label class="form-label">CVV</label><input class="form-input" placeholder="•••" maxlength="4" type="password"></div>
+                  <div class="form-group" style="grid-column:1/-1;"><label class="form-label">Name on Card</label><input class="form-input" placeholder="As printed on card"></div>
+                </div>
+              </div>
+              <div class="payment-option" onclick="selectPayment('net_banking', this)">
+                <input type="radio" name="payment" value="net_banking">
+                <div class="payment-option-icon">NET</div>
+                <div><div class="payment-option-name">Net Banking</div><div class="payment-option-desc">All major banks supported</div></div>
+              </div>
+              <div class="payment-option" onclick="selectPayment('cod', this)">
+                <input type="radio" name="payment" value="cod">
+                <div class="payment-option-icon">COD</div>
+                <div><div class="payment-option-name">Cash on Delivery</div><div class="payment-option-desc">Pay when your order arrives</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 3: Notes -->
+          <div class="checkout-step">
+            <div class="step-header">
+              <div class="step-number">3</div>
+              <h2 class="step-title">Additional Notes</h2>
+            </div>
+            <textarea class="form-input" id="orderNotes" rows="3" placeholder="Special delivery instructions, assembly notes, or anything else…" style="resize:vertical;"></textarea>
+          </div>
+
+        </div>
+
+        <!-- Right: Order Summary -->
+        <div>
+          <div class="order-summary-card">
+            <h3>Order Summary</h3>
+            <div id="checkoutItems" style="margin-bottom:16px;"></div>
+            <hr style="border:none;border-top:1px solid var(--sand);margin:16px 0;">
+            <div class="summary-row"><span>Subtotal</span><span id="chkSubtotal">—</span></div>
+            <div class="summary-row"><span>GST (18%)</span><span id="chkTax">—</span></div>
+            <div class="summary-row"><span>Shipping</span><span id="chkShipping">—</span></div>
+            <div class="summary-row" id="chkDiscountRow" style="display:none;"><span style="color:var(--success)">Coupon</span><span id="chkDiscount" style="color:var(--success);">—</span></div>
+            <div class="summary-row total"><span>Total</span><span id="chkTotal">—</span></div>
+
+            <button class="btn btn-accent btn-block btn-lg" style="margin-top:20px;" onclick="placeOrder()" id="placeOrderBtn">
+              Place Order
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+            <p style="font-size:0.72rem;color:var(--warm-gray);text-align:center;margin-top:10px;">
+              🔒 Your payment information is encrypted and secure
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="footer"></div>
+<script src="../scripts/main.js"></script>
+<script>
+  let selectedAddressId = null;
+  let selectedPayment = 'upi';
+  let cartSummary = null;
+  let cartItems = [];
+
+  // Redirect if not logged in
+  if (!auth.isLoggedIn()) {
+    window.location.href = './login.html?redirect=./checkout.html';
+  }
+
+  async function init() {
+    cartSummary = JSON.parse(localStorage.getItem('echo_cart_summary') || 'null');
+    await loadAddresses();
+    await loadCartItems();
+    renderSummary();
+  }
+
+  async function loadAddresses() {
+    try {
+      const data = await api.get('/addresses');
+      renderAddresses(data.addresses);
+    } catch (err) {
+      document.getElementById('savedAddresses').innerHTML = `<p style="color:var(--warm-gray);font-size:0.875rem;">Could not load addresses. Add a new one.</p>`;
+    }
+  }
+
+  function renderAddresses(addresses) {
+    const el = document.getElementById('savedAddresses');
+    if (!addresses.length) {
+      el.innerHTML = `<p style="color:var(--warm-gray);font-size:0.875rem;margin-bottom:12px;">No saved addresses. Please add one.</p>`;
+      showAddressForm();
+      return;
+    }
+    el.innerHTML = addresses.map(a => `
+      <div class="address-card ${a.is_default || !selectedAddressId ? 'selected' : ''}" onclick="selectAddress(${a.id}, this)">
+        <input type="radio" name="address" value="${a.id}" ${a.is_default || !selectedAddressId ? 'checked' : ''}>
+        <div>
+          <div class="address-label">${a.label || 'Home'}</div>
+          <div class="address-text">
+            <strong>${a.full_name}</strong> · ${a.phone}<br>
+            ${a.address_line1}${a.address_line2 ? ', ' + a.address_line2 : ''}<br>
+            ${a.city}, ${a.state} — ${a.postal_code}
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    const def = addresses.find(a => a.is_default) || addresses[0];
+    selectedAddressId = def.id;
+  }
+
+  function selectAddress(id, el) {
+    selectedAddressId = id;
+    document.querySelectorAll('.address-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    el.querySelector('input').checked = true;
+  }
+
+  function showAddressForm() {
+    document.getElementById('newAddressForm').style.display = 'block';
+    document.getElementById('addAddressBtn').style.display = 'none';
+  }
+  function hideAddressForm() {
+    document.getElementById('newAddressForm').style.display = 'none';
+    document.getElementById('addAddressBtn').style.display = 'flex';
+  }
+
+  async function saveAddress() {
+    const body = {
+      full_name: document.getElementById('addrName').value.trim(),
+      phone: document.getElementById('addrPhone').value.trim(),
+      address_line1: document.getElementById('addrLine1').value.trim(),
+      address_line2: document.getElementById('addrLine2').value.trim(),
+      city: document.getElementById('addrCity').value.trim(),
+      state: document.getElementById('addrState').value.trim(),
+      postal_code: document.getElementById('addrPostal').value.trim(),
+      is_default: document.getElementById('addrDefault').checked
+    };
+    if (!body.full_name || !body.phone || !body.address_line1 || !body.city || !body.state || !body.postal_code) {
+      toast.error('Please fill all required fields'); return;
+    }
+    try {
+      await api.post('/addresses', body);
+      toast.success('Address saved!');
+      hideAddressForm();
+      loadAddresses();
+    } catch (err) { toast.error(err.message); }
+  }
+
+  async function loadCartItems() {
+    try {
+      const data = await api.get('/cart');
+      cartItems = data.cart.items;
+      document.getElementById('checkoutItems').innerHTML = cartItems.map(item => {
+        const img = (Array.isArray(item.images) ? item.images : JSON.parse(item.images || '[]'))[0] || '';
+        return `
+          <div class="order-item-row">
+            <img src="${img}" class="order-item-img" onerror="this.style.display='none'">
+            <div class="order-item-name">${item.name}</div>
+            <div class="order-item-qty">×${item.quantity}</div>
+            <div class="order-item-price">${fmt.price(item.price * item.quantity)}</div>
+          </div>
+        `;
+      }).join('');
+      if (!cartSummary) {
+        cartSummary = { subtotal: data.cart.subtotal, tax: data.cart.subtotal * 0.18, shipping: data.cart.subtotal > 10000 ? 0 : 999, discount: 0 };
+        cartSummary.total = cartSummary.subtotal + cartSummary.tax + cartSummary.shipping;
+      }
+      renderSummary();
+    } catch {}
+  }
+
+  function renderSummary() {
+    if (!cartSummary) return;
+    const { subtotal, tax, shipping, discount, total } = cartSummary;
+    document.getElementById('chkSubtotal').textContent = fmt.price(subtotal);
+    document.getElementById('chkTax').textContent = fmt.price(tax);
+    document.getElementById('chkShipping').textContent = shipping === 0 ? 'FREE' : fmt.price(shipping);
+    document.getElementById('chkTotal').textContent = fmt.price(total);
+    if (discount > 0) {
+      document.getElementById('chkDiscountRow').style.display = 'flex';
+      document.getElementById('chkDiscount').textContent = `-${fmt.price(discount)}`;
+    }
+  }
+
+  function selectPayment(method, el) {
+    selectedPayment = method;
+    document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    el.querySelector('input').checked = true;
+    document.getElementById('cardFields').style.display = method === 'credit_card' ? 'block' : 'none';
+  }
+
+  function formatCardNumber(input) {
+    let v = input.value.replace(/\D/g,'').substring(0,16);
+    input.value = v.replace(/(.{4})/g,'$1 ').trim();
+  }
+
+  async function placeOrder() {
+    if (!selectedAddressId) { toast.error('Please select a delivery address'); return; }
+    if (!selectedPayment) { toast.error('Please select a payment method'); return; }
+    if (!cartItems.length) { toast.error('Your cart is empty'); return; }
+
+    const btn = document.getElementById('placeOrderBtn');
+    btn.classList.add('btn-loading'); btn.disabled = true;
+
+    try {
+      const coupon = localStorage.getItem('echo_coupon') || '';
+      const notes = document.getElementById('orderNotes').value.trim();
+      const data = await api.post('/orders/place', {
+        address_id: selectedAddressId,
+        payment_method: selectedPayment,
+        coupon_code: coupon,
+        notes
+      });
+
+      localStorage.removeItem('echo_coupon');
+      localStorage.removeItem('echo_cart_summary');
+
+      document.getElementById('checkoutForm').style.display = 'none';
+      document.getElementById('successScreen').style.display = 'block';
+      document.getElementById('successOrderNum').textContent = `Order #${data.order.order_number}`;
+      document.getElementById('successDelivery').textContent = `Expected delivery by ${fmt.date(data.order.estimated_delivery)}`;
+      updateCartCount();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      toast.error(err.message || 'Failed to place order');
+      btn.classList.remove('btn-loading'); btn.disabled = false;
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>

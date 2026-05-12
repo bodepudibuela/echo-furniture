@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shop All Furniture — Echo Furniture</title>
+  <link rel="stylesheet" href="../styles/main.css" />
+  <style>
+    .shop-layout { display: flex; gap: 40px; align-items: flex-start; }
+    .filter-panel {
+      width: 260px;
+      flex-shrink: 0;
+      background: white;
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: var(--shadow-sm);
+      position: sticky;
+      top: calc(var(--nav-height) + 24px);
+    }
+    .filter-panel-title { font-family: var(--font-display); font-size: 1.3rem; margin-bottom: 24px; }
+    .filter-divider { border: none; border-top: 1px solid var(--beige); margin: 20px 0; }
+    .filter-check { display: flex; align-items: center; gap: 10px; padding: 6px 0; cursor: pointer; }
+    .filter-check input { accent-color: var(--accent); width: 15px; height: 15px; flex-shrink: 0; }
+    .filter-check label { font-size: 0.875rem; color: var(--charcoal); cursor: pointer; flex: 1; }
+    .filter-check .count { font-size: 0.75rem; color: var(--warm-gray); }
+
+    .price-inputs { display: flex; align-items: center; gap: 8px; }
+    .price-inputs input { width: 90px; padding: 8px 10px; border: 1.5px solid var(--beige); border-radius: 4px; font-size: 0.82rem; font-family: var(--font-body); }
+    .price-inputs span { color: var(--warm-gray); font-size: 0.85rem; }
+
+    .rating-filter { display: flex; flex-direction: column; gap: 6px; }
+    .rating-option { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px 0; }
+    .rating-option input { accent-color: var(--accent); }
+    .rating-stars { color: var(--accent); font-size: 0.85rem; }
+
+    .products-area { flex: 1; min-width: 0; }
+    .products-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+    .toolbar-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 240px; }
+    .results-count { font-size: 0.85rem; color: var(--warm-gray); white-space: nowrap; }
+    .sort-select {
+      padding: 10px 36px 10px 14px;
+      border: 1.5px solid var(--beige);
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-family: var(--font-body);
+      color: var(--charcoal);
+      background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239B8F82' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 12px center;
+      appearance: none;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .sort-select:focus { border-color: var(--accent); outline: none; }
+
+    .view-toggle { display: flex; gap: 4px; }
+    .view-btn {
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      border: 1.5px solid var(--beige);
+      border-radius: 4px;
+      color: var(--warm-gray);
+      transition: var(--transition);
+    }
+    .view-btn.active, .view-btn:hover { border-color: var(--dark); color: var(--dark); background: var(--cream); }
+    .view-btn svg { width: 16px; height: 16px; stroke-width: 1.5; }
+
+    .products-grid.list-view { grid-template-columns: 1fr; }
+    .products-grid.list-view .product-card { display: grid; grid-template-columns: 220px 1fr; }
+    .products-grid.list-view .product-img-wrap { aspect-ratio: auto; height: 200px; }
+
+    .active-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+    .filter-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px;
+      background: var(--cream);
+      border: 1px solid var(--sand);
+      border-radius: 100px;
+      font-size: 0.78rem;
+      color: var(--charcoal);
+    }
+    .filter-tag button { color: var(--warm-gray); font-size: 14px; line-height: 1; }
+    .filter-tag button:hover { color: var(--error); }
+
+    .mobile-filter-btn {
+      display: none;
+      align-items: center; gap: 8px;
+      padding: 10px 16px;
+      border: 1.5px solid var(--beige);
+      border-radius: 4px;
+      font-size: 0.85rem;
+      background: white;
+      color: var(--charcoal);
+    }
+    .mobile-filter-btn svg { width: 16px; height: 16px; }
+
+    .filter-drawer-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 1500;
+    }
+    .filter-drawer {
+      position: fixed;
+      left: 0; top: 0; bottom: 0;
+      width: 300px;
+      background: white;
+      overflow-y: auto;
+      padding: 24px;
+      z-index: 1501;
+      transform: translateX(-100%);
+      transition: transform 0.35s var(--ease);
+    }
+    .filter-drawer.open { transform: translateX(0); }
+    .filter-drawer-overlay.open { display: block; }
+
+    @media (max-width: 1024px) {
+      .filter-panel { display: none; }
+      .mobile-filter-btn { display: flex; }
+    }
+    @media (max-width: 600px) {
+      .products-grid { grid-template-columns: repeat(2,1fr); gap: 12px; }
+      .products-grid.list-view { grid-template-columns: 1fr; }
+      .products-grid.list-view .product-card { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar" id="navbar"></nav>
+
+<div class="page-wrapper">
+  <div class="page-header">
+    <div class="container">
+      <div class="breadcrumb" style="margin-bottom:12px;">
+        <a href="../index.html">Home</a>
+        <span>/</span>
+        <span id="breadcrumbCurrent">All Products</span>
+      </div>
+      <h1 id="pageTitle">All Furniture</h1>
+      <p style="color:var(--warm-gray);margin-top:8px;font-size:0.95rem;" id="pageSubtitle">Discover our complete collection of premium furniture</p>
+    </div>
+  </div>
+
+  <div class="container" style="padding-bottom: 80px;">
+    <!-- Active Filters -->
+    <div class="active-filters" id="activeFilters"></div>
+
+    <div class="shop-layout">
+      <!-- ── FILTER PANEL (desktop) ── -->
+      <aside class="filter-panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+          <h3 class="filter-panel-title" style="margin:0">Filters</h3>
+          <button onclick="clearAllFilters()" style="font-size:0.78rem;color:var(--accent);font-family:var(--font-body);">Clear All</button>
+        </div>
+        <div id="filterContent"></div>
+      </aside>
+
+      <!-- ── PRODUCTS AREA ── -->
+      <div class="products-area">
+        <div class="products-toolbar">
+          <div class="toolbar-left">
+            <button class="mobile-filter-btn" onclick="openFilterDrawer()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+              Filters
+            </button>
+            <div class="search-bar" style="flex:1">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              <input type="text" id="searchInput" placeholder="Search furniture…" oninput="debounceSearch()">
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <span class="results-count" id="resultsCount">Loading…</span>
+            <select class="sort-select" id="sortSelect" onchange="applySort()">
+              <option value="newest">Newest First</option>
+              <option value="price_asc">Price: Low to High</option>
+              <option value="price_desc">Price: High to Low</option>
+              <option value="rating">Top Rated</option>
+              <option value="popular">Most Popular</option>
+            </select>
+            <div class="view-toggle">
+              <button class="view-btn active" id="gridViewBtn" onclick="setView('grid')" title="Grid View">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              </button>
+              <button class="view-btn" id="listViewBtn" onclick="setView('list')" title="List View">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="products-grid" id="productsGrid">
+          <div class="skeleton" style="height:360px;border-radius:8px;"></div>
+          <div class="skeleton" style="height:360px;border-radius:8px;"></div>
+          <div class="skeleton" style="height:360px;border-radius:8px;"></div>
+          <div class="skeleton" style="height:360px;border-radius:8px;"></div>
+          <div class="skeleton" style="height:360px;border-radius:8px;"></div>
+          <div class="skeleton" style="height:360px;border-radius:8px;"></div>
+        </div>
+
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Mobile Filter Drawer ── -->
+<div class="filter-drawer-overlay" id="filterDrawerOverlay" onclick="closeFilterDrawer()"></div>
+<div class="filter-drawer" id="filterDrawer">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+    <h3 style="font-family:var(--font-display);font-size:1.3rem;">Filters</h3>
+    <button onclick="closeFilterDrawer()" style="font-size:22px;color:var(--warm-gray);">×</button>
+  </div>
+  <div id="filterContentMobile"></div>
+  <button onclick="closeFilterDrawer()" class="btn btn-primary btn-block" style="margin-top:24px;">Apply Filters</button>
+</div>
+
+<div id="footer"></div>
+<script src="../scripts/main.js"></script>
+<script>
+  // ── State ──
+  const state = {
+    page: 1,
+    limit: 12,
+    sort: 'newest',
+    search: '',
+    category: '',
+    minPrice: '',
+    maxPrice: '',
+    minRating: '',
+    featured: ''
+  };
+
+  let searchTimer = null;
+
+  // ── Read URL params ──
+  function readParams() {
+    const p = new URLSearchParams(location.search);
+    state.category  = p.get('category') || '';
+    state.featured  = p.get('featured') || '';
+    state.sort      = p.get('sort') || 'newest';
+    state.search    = p.get('search') || '';
+    state.minPrice  = p.get('min_price') || '';
+    state.maxPrice  = p.get('max_price') || '';
+    state.minRating = p.get('min_rating') || '';
+    state.page      = parseInt(p.get('page')) || 1;
+
+    document.getElementById('sortSelect').value = state.sort;
+    if (state.search) document.getElementById('searchInput').value = state.search;
+
+    // Update page header
+    if (state.category) {
+      const name = state.category.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+      document.getElementById('pageTitle').textContent = name;
+      document.getElementById('breadcrumbCurrent').textContent = name;
+      document.getElementById('pageSubtitle').textContent = `Explore our premium ${name.toLowerCase()} collection`;
+    }
+    if (state.featured === 'true') {
+      document.getElementById('pageTitle').textContent = 'Featured Products';
+      document.getElementById('breadcrumbCurrent').textContent = 'Featured';
+    }
+  }
+
+  // ── Build query string ──
+  function buildQuery() {
+    const q = new URLSearchParams();
+    q.set('page', state.page);
+    q.set('limit', state.limit);
+    q.set('sort', state.sort);
+    if (state.search)    q.set('search', state.search);
+    if (state.category)  q.set('category', state.category);
+    if (state.minPrice)  q.set('min_price', state.minPrice);
+    if (state.maxPrice)  q.set('max_price', state.maxPrice);
+    if (state.minRating) q.set('min_rating', state.minRating);
+    if (state.featured)  q.set('featured', state.featured);
+    return q.toString();
+  }
+
+  // ── Load Products ──
+  async function loadProducts() {
+    const grid = document.getElementById('productsGrid');
+    grid.innerHTML = Array(6).fill('<div class="skeleton" style="height:360px;border-radius:8px;"></div>').join('');
+
+    try {
+      const data = await api.get(`/products?${buildQuery()}`);
+      const { products, pagination } = data;
+
+      document.getElementById('resultsCount').textContent =
+        `${pagination.total} product${pagination.total !== 1 ? 's' : ''} found`;
+
+      if (!products.length) {
+        grid.innerHTML = `
+          <div class="empty-state" style="grid-column:1/-1;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <h3>No products found</h3>
+            <p>Try adjusting your filters or search term</p>
+            <button onclick="clearAllFilters()" class="btn btn-primary">Clear Filters</button>
+          </div>`;
+        document.getElementById('pagination').innerHTML = '';
+        return;
+      }
+
+      grid.innerHTML = products.map(buildProductCard).join('');
+      renderPagination(pagination);
+      renderActiveFilters();
+    } catch (err) {
+      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><h3>Failed to load</h3><p>${err.message}</p><p style="font-size:0.8rem;color:var(--warm-gray);">Make sure the backend server is running on port 5000.</p></div>`;
+    }
+  }
+
+  // ── Pagination ──
+  function renderPagination({ total, page, pages }) {
+    const el = document.getElementById('pagination');
+    if (pages <= 1) { el.innerHTML = ''; return; }
+
+    let html = '';
+    html += `<button class="page-btn ${page === 1 ? 'disabled' : ''}" onclick="goPage(${page-1})">‹</button>`;
+
+    for (let i = 1; i <= pages; i++) {
+      if (i === 1 || i === pages || (i >= page - 2 && i <= page + 2)) {
+        html += `<button class="page-btn ${i === page ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+      } else if (i === page - 3 || i === page + 3) {
+        html += `<span style="padding:0 4px;color:var(--warm-gray)">…</span>`;
+      }
+    }
+
+    html += `<button class="page-btn ${page === pages ? 'disabled' : ''}" onclick="goPage(${page+1})">›</button>`;
+    el.innerHTML = html;
+  }
+
+  function goPage(n) {
+    state.page = n;
+    loadProducts();
+    window.scrollTo({ top: 200, behavior: 'smooth' });
+  }
+
+  // ── Active Filters Tags ──
+  function renderActiveFilters() {
+    const el = document.getElementById('activeFilters');
+    const tags = [];
+    if (state.category)  tags.push({ label: state.category.replace(/-/g,' '), clear: () => { state.category = ''; reload(); } });
+    if (state.search)    tags.push({ label: `"${state.search}"`, clear: () => { state.search = ''; document.getElementById('searchInput').value = ''; reload(); } });
+    if (state.minPrice)  tags.push({ label: `Min ₹${state.minPrice}`, clear: () => { state.minPrice = ''; reload(); } });
+    if (state.maxPrice)  tags.push({ label: `Max ₹${state.maxPrice}`, clear: () => { state.maxPrice = ''; reload(); } });
+    if (state.minRating) tags.push({ label: `${state.minRating}★+`, clear: () => { state.minRating = ''; reload(); } });
+    if (state.featured)  tags.push({ label: 'Featured', clear: () => { state.featured = ''; reload(); } });
+
+    if (!tags.length) { el.innerHTML = ''; return; }
+    el.innerHTML = tags.map((t, i) => `
+      <span class="filter-tag">${t.label} <button onclick="activeFilterClear(${i})">×</button></span>
+    `).join('');
+    window._filterClears = tags.map(t => t.clear);
+  }
+  function activeFilterClear(i) { window._filterClears[i](); }
+
+  function clearAllFilters() {
+    Object.assign(state, { category:'', search:'', minPrice:'', maxPrice:'', minRating:'', featured:'', page:1 });
+    document.getElementById('searchInput').value = '';
+    document.getElementById('pageTitle').textContent = 'All Furniture';
+    document.getElementById('breadcrumbCurrent').textContent = 'All Products';
+    renderFilterUI();
+    reload();
+  }
+
+  // ── Filter UI ──
+  async function renderFilterUI() {
+    let cats = [];
+    try { const d = await api.get('/categories'); cats = d.categories; } catch {}
+
+    const html = `
+      <div class="filter-section">
+        <div class="filter-title">Category</div>
+        ${cats.map(c => `
+          <label class="filter-check">
+            <input type="checkbox" value="${c.slug}" ${state.category === c.slug ? 'checked' : ''} onchange="setCategoryFilter(this)">
+            <span>${c.name}</span>
+            <span class="count">${c.product_count}</span>
+          </label>
+        `).join('')}
+      </div>
+      <hr class="filter-divider">
+      <div class="filter-section">
+        <div class="filter-title">Price Range</div>
+        <div class="price-inputs">
+          <input class="price-input" type="number" placeholder="Min ₹" value="${state.minPrice}" id="minPriceInput" onchange="setPriceFilter()">
+          <span>—</span>
+          <input class="price-input" type="number" placeholder="Max ₹" value="${state.maxPrice}" id="maxPriceInput" onchange="setPriceFilter()">
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">
+          ${[['0','10000','Under ₹10K'],['10000','30000','₹10K–30K'],['30000','60000','₹30K–60K'],['60000','','₹60K+']].map(([min,max,label]) =>
+            `<button onclick="setPresetPrice('${min}','${max}')" class="btn btn-ghost btn-sm" style="font-size:0.72rem;padding:5px 10px;">${label}</button>`
+          ).join('')}
+        </div>
+      </div>
+      <hr class="filter-divider">
+      <div class="filter-section">
+        <div class="filter-title">Rating</div>
+        <div class="rating-filter">
+          ${[4,3,2,1].map(r => `
+            <label class="rating-option">
+              <input type="radio" name="rating" value="${r}" ${state.minRating == r ? 'checked' : ''} onchange="setRatingFilter(this)">
+              <span class="rating-stars">${'★'.repeat(r)}${'☆'.repeat(5-r)}</span>
+              <span style="font-size:0.78rem;color:var(--warm-gray);">& above</span>
+            </label>
+          `).join('')}
+        </div>
+      </div>
+      <hr class="filter-divider">
+      <div class="filter-section">
+        <label class="filter-check">
+          <input type="checkbox" ${state.featured === 'true' ? 'checked' : ''} onchange="state.featured = this.checked ? 'true' : ''; reload()">
+          <span>Featured Only</span>
+        </label>
+      </div>
+      <button onclick="clearAllFilters()" class="btn btn-outline btn-block btn-sm" style="margin-top:8px;">Clear All Filters</button>
+    `;
+
+    document.getElementById('filterContent').innerHTML = html;
+    document.getElementById('filterContentMobile').innerHTML = html;
+  }
+
+  function setCategoryFilter(el) {
+    state.category = el.checked ? el.value : '';
+    state.page = 1;
+    reload();
+  }
+  function setPriceFilter() {
+    state.minPrice = document.getElementById('minPriceInput')?.value || '';
+    state.maxPrice = document.getElementById('maxPriceInput')?.value || '';
+    state.page = 1;
+    reload();
+  }
+  function setPresetPrice(min, max) {
+    state.minPrice = min; state.maxPrice = max; state.page = 1;
+    renderFilterUI(); reload();
+  }
+  function setRatingFilter(el) {
+    state.minRating = el.value; state.page = 1; reload();
+  }
+  function applySort() {
+    state.sort = document.getElementById('sortSelect').value;
+    state.page = 1; reload();
+  }
+  function debounceSearch() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+      state.search = document.getElementById('searchInput').value.trim();
+      state.page = 1; reload();
+    }, 400);
+  }
+  function reload() { loadProducts(); renderActiveFilters(); }
+
+  // ── View Toggle ──
+  function setView(v) {
+    const grid = document.getElementById('productsGrid');
+    document.getElementById('gridViewBtn').classList.toggle('active', v === 'grid');
+    document.getElementById('listViewBtn').classList.toggle('active', v === 'list');
+    grid.classList.toggle('list-view', v === 'list');
+  }
+
+  // ── Mobile Drawer ──
+  function openFilterDrawer() {
+    document.getElementById('filterDrawer').classList.add('open');
+    document.getElementById('filterDrawerOverlay').classList.add('open');
+  }
+  function closeFilterDrawer() {
+    document.getElementById('filterDrawer').classList.remove('open');
+    document.getElementById('filterDrawerOverlay').classList.remove('open');
+  }
+
+  // ── Init ──
+  readParams();
+  renderFilterUI();
+  loadProducts();
+</script>
+</body>
+</html>

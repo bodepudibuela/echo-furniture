@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Profile — Echo Furniture</title>
+  <link rel="stylesheet" href="../styles/main.css"/>
+  <style>
+    .profile-layout { display:grid; grid-template-columns:260px 1fr; gap:32px; align-items:start; }
+    .profile-sidebar { background:white; border-radius:12px; padding:0; box-shadow:var(--shadow-sm); overflow:hidden; position:sticky; top:calc(var(--nav-height)+24px); }
+    .profile-sidebar-header { padding:28px; background:linear-gradient(135deg,var(--dark),var(--charcoal)); color:white; text-align:center; }
+    .avatar { width:72px; height:72px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:1.8rem; color:white; margin:0 auto 12px; }
+    .avatar-name { font-family:var(--font-display); font-size:1.2rem; }
+    .avatar-email { font-size:0.78rem; opacity:0.7; margin-top:4px; }
+    .sidebar-nav-item { display:flex; align-items:center; gap:12px; padding:14px 20px; font-size:0.875rem; color:var(--charcoal); border-left:3px solid transparent; transition:var(--transition); cursor:pointer; }
+    .sidebar-nav-item:hover { background:var(--cream); color:var(--accent); }
+    .sidebar-nav-item.active { border-left-color:var(--accent); background:var(--cream); color:var(--accent); font-weight:500; }
+    .sidebar-nav-item svg { width:17px; height:17px; stroke-width:1.5; flex-shrink:0; }
+
+    .profile-section { background:white; border-radius:12px; padding:28px; box-shadow:var(--shadow-sm); margin-bottom:20px; }
+    .profile-section h3 { font-family:var(--font-display); font-size:1.4rem; margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid var(--beige); }
+
+    .form-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+
+    .order-card { border:1.5px solid var(--beige); border-radius:8px; padding:20px; margin-bottom:14px; transition:var(--transition); }
+    .order-card:hover { border-color:var(--sand); box-shadow:var(--shadow-sm); }
+    .order-card-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
+    .order-num { font-weight:600; font-size:0.95rem; color:var(--dark); }
+    .order-date { font-size:0.78rem; color:var(--warm-gray); margin-top:3px; }
+    .order-products { font-size:0.85rem; color:var(--charcoal); margin-bottom:12px; }
+    .order-footer { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+    .order-total { font-weight:700; font-size:1rem; }
+
+    @media (max-width:768px) {
+      .profile-layout { grid-template-columns:1fr; }
+      .profile-sidebar { position:static; }
+      .form-grid-2 { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar" id="navbar"></nav>
+
+<div class="page-wrapper">
+  <div class="page-header">
+    <div class="container">
+      <h1>My Account</h1>
+    </div>
+  </div>
+
+  <div class="container" style="padding-bottom:80px;">
+    <div class="profile-layout">
+      <!-- Sidebar -->
+      <aside class="profile-sidebar">
+        <div class="profile-sidebar-header">
+          <div class="avatar" id="sidebarAvatar">?</div>
+          <div class="avatar-name" id="sidebarName">Loading…</div>
+          <div class="avatar-email" id="sidebarEmail"></div>
+        </div>
+        <nav>
+          <div class="sidebar-nav-item active" onclick="showSection('profile')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Profile Details
+          </div>
+          <div class="sidebar-nav-item" onclick="window.location='./orders.html'">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            My Orders
+          </div>
+          <div class="sidebar-nav-item" onclick="window.location='./wishlist.html'">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+            Wishlist
+          </div>
+          <div class="sidebar-nav-item" onclick="showSection('addresses')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Addresses
+          </div>
+          <div class="sidebar-nav-item" onclick="showSection('security')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            Security
+          </div>
+          <div class="sidebar-nav-item" onclick="handleLogout()" style="color:var(--error);border-top:1px solid var(--beige);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Logout
+          </div>
+        </nav>
+      </aside>
+
+      <!-- Content -->
+      <div>
+        <!-- Profile Section -->
+        <div class="profile-section" id="section-profile">
+          <h3>Profile Details</h3>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">First Name</label>
+              <input class="form-input" type="text" id="profFirstName">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Last Name</label>
+              <input class="form-input" type="text" id="profLastName">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input class="form-input" type="email" id="profEmail" disabled style="background:var(--cream);cursor:not-allowed;">
+            <div style="font-size:0.75rem;color:var(--warm-gray);margin-top:4px;">Email cannot be changed for security reasons</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            <input class="form-input" type="tel" id="profPhone" placeholder="+91 98765 43210">
+          </div>
+          <button class="btn btn-primary" onclick="updateProfile()">Save Changes</button>
+        </div>
+
+        <!-- Security Section -->
+        <div class="profile-section" id="section-security" style="display:none;">
+          <h3>Change Password</h3>
+          <div class="form-group">
+            <label class="form-label">Current Password</label>
+            <input class="form-input" type="password" id="currentPwd" placeholder="Your current password">
+          </div>
+          <div class="form-group">
+            <label class="form-label">New Password</label>
+            <input class="form-input" type="password" id="newPwd" placeholder="Minimum 6 characters">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirm New Password</label>
+            <input class="form-input" type="password" id="confirmPwd" placeholder="Repeat new password">
+          </div>
+          <button class="btn btn-primary" onclick="changePassword()">Update Password</button>
+        </div>
+
+        <!-- Addresses Section -->
+        <div class="profile-section" id="section-addresses" style="display:none;">
+          <h3>Saved Addresses</h3>
+          <div id="profileAddressList"></div>
+          <button class="btn btn-outline" onclick="window.location='./checkout.html'" style="margin-top:8px;">Manage Addresses in Checkout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="footer"></div>
+<script src="../scripts/main.js"></script>
+<script>
+  if (!auth.isLoggedIn()) window.location.href = './login.html';
+
+  async function initProfile() {
+    try {
+      const data = await api.get('/auth/me');
+      const u = data.user;
+      document.getElementById('profFirstName').value = u.first_name || '';
+      document.getElementById('profLastName').value = u.last_name || '';
+      document.getElementById('profEmail').value = u.email || '';
+      document.getElementById('profPhone').value = u.phone || '';
+      document.getElementById('sidebarName').textContent = `${u.first_name} ${u.last_name}`;
+      document.getElementById('sidebarEmail').textContent = u.email;
+      document.getElementById('sidebarAvatar').textContent = u.first_name?.charAt(0).toUpperCase() || '?';
+    } catch {}
+  }
+
+  async function updateProfile() {
+    const first_name = document.getElementById('profFirstName').value.trim();
+    const last_name = document.getElementById('profLastName').value.trim();
+    const phone = document.getElementById('profPhone').value.trim();
+    if (!first_name || !last_name) { toast.error('Name fields are required'); return; }
+    try {
+      await api.put('/auth/update-profile', { first_name, last_name, phone });
+      const user = auth.getUser();
+      auth.login(auth.getToken(), { ...user, first_name, last_name });
+      toast.success('Profile updated successfully!');
+    } catch (err) { toast.error(err.message); }
+  }
+
+  async function changePassword() {
+    const current_password = document.getElementById('currentPwd').value;
+    const new_password = document.getElementById('newPwd').value;
+    const confirm = document.getElementById('confirmPwd').value;
+    if (!current_password || !new_password) { toast.error('Please fill all fields'); return; }
+    if (new_password !== confirm) { toast.error('New passwords do not match'); return; }
+    if (new_password.length < 6) { toast.error('Password must be at least 6 characters'); return; }
+    try {
+      await api.put('/auth/change-password', { current_password, new_password });
+      toast.success('Password changed successfully!');
+      document.getElementById('currentPwd').value = '';
+      document.getElementById('newPwd').value = '';
+      document.getElementById('confirmPwd').value = '';
+    } catch (err) { toast.error(err.message); }
+  }
+
+  async function loadAddresses() {
+    try {
+      const data = await api.get('/addresses');
+      const el = document.getElementById('profileAddressList');
+      if (!data.addresses.length) { el.innerHTML = '<p style="color:var(--warm-gray)">No saved addresses.</p>'; return; }
+      el.innerHTML = data.addresses.map(a => `
+        <div style="border:1.5px solid var(--beige);border-radius:8px;padding:16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+          <div>
+            <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);font-weight:600;margin-bottom:4px;">${a.label || 'Home'} ${a.is_default ? '· Default' : ''}</div>
+            <div style="font-size:0.88rem;color:var(--charcoal);line-height:1.6;">
+              <strong>${a.full_name}</strong> · ${a.phone}<br>
+              ${a.address_line1}${a.address_line2 ? ', ' + a.address_line2 : ''}<br>
+              ${a.city}, ${a.state} — ${a.postal_code}
+            </div>
+          </div>
+          <button onclick="deleteAddress(${a.id})" style="font-size:0.78rem;color:var(--error);white-space:nowrap;">Delete</button>
+        </div>
+      `).join('');
+    } catch {}
+  }
+
+  async function deleteAddress(id) {
+    if (!confirm('Delete this address?')) return;
+    try { await api.delete(`/addresses/${id}`); toast.success('Address deleted'); loadAddresses(); }
+    catch (err) { toast.error(err.message); }
+  }
+
+  function showSection(name) {
+    document.querySelectorAll('.profile-section').forEach(s => s.style.display = 'none');
+    document.getElementById(`section-${name}`).style.display = 'block';
+    document.querySelectorAll('.sidebar-nav-item').forEach(n => n.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    if (name === 'addresses') loadAddresses();
+  }
+
+  initProfile();
+</script>
+</body>
+</html>
