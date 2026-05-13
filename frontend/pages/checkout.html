@@ -377,6 +377,9 @@
       localStorage.removeItem('echo_coupon');
       localStorage.removeItem('echo_cart_summary');
 
+      // ── Send order email to owner ──
+      sendOrderEmail(data.order);
+
       document.getElementById('checkoutForm').style.display = 'none';
       document.getElementById('successScreen').style.display = 'block';
       document.getElementById('successOrderNum').textContent = `Order #${data.order.order_number}`;
@@ -390,6 +393,41 @@
   }
 
   init();
+</script>
+
+<!-- EmailJS -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+  // ── EmailJS Config ──
+  const EMAILJS_PUBLIC_KEY  = 'G_XQnU4pMSy6AJb0e';
+  const EMAILJS_SERVICE_ID  = 'service_wytzaib';
+  const EMAILJS_TEMPLATE_ID = 'template_udtbx6e';
+
+  emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
+  function sendOrderEmail(order) {
+    const user = auth.getUser();
+    const items = cartItems.map(i => ({
+      name:  i.name,
+      price: fmt.price(i.price * i.quantity),
+      units: i.quantity
+    }));
+
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      order_id:      order.order_number,
+      email:         user?.email || 'Customer',
+      orders:        items,
+      cost: {
+        shipping: cartSummary?.shipping === 0 ? 'FREE' : fmt.price(cartSummary?.shipping),
+        tax:      fmt.price(cartSummary?.tax),
+        total:    fmt.price(cartSummary?.total)
+      }
+    }).then(() => {
+      console.log('Order email sent to bodepudibuela@gmail.com ✅');
+    }).catch((err) => {
+      console.log('Email send failed:', err);
+    });
+  }
 </script>
 </body>
 </html>
