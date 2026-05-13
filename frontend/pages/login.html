@@ -3,332 +3,709 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login / Register — Echo Furniture</title>
-  <link rel="stylesheet" href="../styles/main.css" />
+  <title>Sign In — Echo Furniture</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="../scripts/main.js" defer></script>
   <style>
-    body { background: var(--cream); }
-    .auth-wrapper {
-      min-height: 100vh;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream:        #FAF7F2;
+      --beige:        #EDE8DF;
+      --sand:         #D4C5A9;
+      --accent:       #8B6914;
+      --accent-light: #C8A84B;
+      --dark:         #1A1612;
+      --charcoal:     #2C2520;
+      --warm-gray:    #6B6259;
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body:    'Jost', sans-serif;
+      --shadow:       0 8px 40px rgba(26,22,18,0.12);
+      --radius:       4px;
+      --transition:   0.3s ease;
     }
-    .auth-visual {
-      position: relative;
+
+    body {
+      font-family: var(--font-body);
+      background: var(--cream);
+      min-height: 100vh;
+      display: flex;
+      color: var(--dark);
       overflow: hidden;
     }
-    .auth-visual img { width: 100%; height: 100%; object-fit: cover; }
-    .auth-visual-overlay {
-      position: absolute; inset: 0;
-      background: linear-gradient(to bottom right, rgba(28,22,18,0.7), rgba(139,105,20,0.4));
-      display: flex; flex-direction: column; justify-content: flex-end;
-      padding: 48px;
-    }
-    .auth-visual-quote {
-      font-family: var(--font-display);
-      font-size: 2rem;
-      color: white;
-      font-weight: 300;
-      line-height: 1.3;
-      margin-bottom: 16px;
-    }
-    .auth-visual-credit { font-size: 0.85rem; color: rgba(255,255,255,0.6); }
 
-    .auth-panel {
+    /* ── Left Panel ── */
+    .left-panel {
+      width: 45%;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .left-panel img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .left-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(160deg, rgba(26,22,18,0.55) 0%, rgba(139,105,20,0.25) 100%);
+      display: flex; flex-direction: column;
+      justify-content: space-between;
+      padding: 48px 40px;
+    }
+    .left-logo {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      color: white;
+      letter-spacing: 0.02em;
+      font-weight: 300;
+    }
+    .left-logo span { color: var(--accent-light); }
+    .left-tagline {
+      color: white;
+    }
+    .left-tagline h2 {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 3.5vw, 3rem);
+      font-weight: 300;
+      line-height: 1.2;
+      margin-bottom: 16px;
+      font-style: italic;
+    }
+    .left-tagline p {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 0.05em;
+      line-height: 1.7;
+    }
+
+    /* ── Right Panel ── */
+    .right-panel {
+      flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 48px;
+      align-items: center;
+      padding: 48px 40px;
+      overflow-y: auto;
       background: white;
     }
-    .auth-logo {
-      font-family: var(--font-display);
-      font-size: 1.6rem;
-      color: var(--dark);
-      margin-bottom: 40px;
-      display: block;
-    }
-    .auth-logo span { color: var(--accent); }
 
-    .auth-tabs {
-      display: flex;
-      border-bottom: 2px solid var(--beige);
-      margin-bottom: 32px;
+    .auth-box {
+      width: 100%;
+      max-width: 420px;
     }
-    .auth-tab {
-      padding: 12px 24px;
-      font-size: 0.9rem;
+
+    /* ── Tabs ── */
+    .auth-header {
+      margin-bottom: 36px;
+    }
+    .auth-brand {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      color: var(--charcoal);
+      margin-bottom: 28px;
+      font-weight: 400;
+      letter-spacing: 0.03em;
+    }
+    .auth-brand span { color: var(--accent); }
+
+    .tab-group {
+      display: flex;
+      border-bottom: 1px solid var(--beige);
+      gap: 0;
+    }
+    .tab-btn {
+      background: none; border: none; cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 0.85rem;
       font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 10px 0;
+      margin-right: 28px;
       color: var(--warm-gray);
       border-bottom: 2px solid transparent;
-      margin-bottom: -2px;
+      margin-bottom: -1px;
       transition: var(--transition);
     }
-    .auth-tab.active { color: var(--dark); border-bottom-color: var(--dark); }
-    .auth-tab:hover { color: var(--charcoal); }
+    .tab-btn.active {
+      color: var(--dark);
+      border-bottom-color: var(--accent);
+    }
 
-    .auth-form { max-width: 400px; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .divider-or { display: flex; align-items: center; gap: 12px; margin: 20px 0; font-size: 0.8rem; color: var(--warm-gray); }
-    .divider-or::before, .divider-or::after { content: ''; flex: 1; height: 1px; background: var(--beige); }
+    /* ── Form ── */
+    .auth-form { display: none; }
+    .auth-form.active { display: block; }
 
-    .social-login { display: flex; gap: 12px; }
-    .social-btn {
-      flex: 1;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      padding: 12px;
-      border: 1.5px solid var(--beige);
-      border-radius: 4px;
-      font-size: 0.85rem;
+    .form-title {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 400;
       color: var(--charcoal);
+      margin-bottom: 6px;
+    }
+    .form-subtitle {
+      font-size: 0.82rem;
+      color: var(--warm-gray);
+      margin-bottom: 28px;
+    }
+
+    .field-group { margin-bottom: 18px; }
+    .field-label {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--warm-gray);
+      margin-bottom: 7px;
+    }
+    .field-row {
+      position: relative;
+    }
+    .field-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--beige);
+      border-radius: var(--radius);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      color: var(--dark);
+      background: var(--cream);
+      outline: none;
       transition: var(--transition);
     }
-    .social-btn:hover { border-color: var(--charcoal); background: var(--cream); }
-
-    .password-wrap { position: relative; }
-    .password-toggle {
-      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-      color: var(--warm-gray); cursor: pointer;
+    .field-input:focus {
+      border-color: var(--accent);
+      background: white;
+      box-shadow: 0 0 0 3px rgba(139,105,20,0.08);
     }
-    .password-toggle svg { width: 18px; height: 18px; stroke-width: 1.5; }
+    .field-input.error { border-color: #C0392B; }
 
-    .strength-bar { height: 4px; border-radius: 2px; background: var(--beige); margin-top: 6px; overflow: hidden; }
-    .strength-fill { height: 100%; width: 0; transition: width 0.3s, background 0.3s; border-radius: 2px; }
+    .field-toggle {
+      position: absolute; right: 12px; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none; cursor: pointer;
+      color: var(--warm-gray); padding: 4px;
+      display: flex; align-items: center;
+    }
+    .field-toggle svg { width: 16px; height: 16px; }
 
-    .terms-text { font-size: 0.78rem; color: var(--warm-gray); line-height: 1.6; margin-top: 14px; }
-    .terms-text a { color: var(--accent); text-decoration: underline; }
+    .field-error {
+      font-size: 0.75rem;
+      color: #C0392B;
+      margin-top: 5px;
+      display: none;
+    }
 
+    .field-row-2 {
+      display: flex;
+      gap: 12px;
+    }
+    .field-row-2 .field-group { flex: 1; }
+
+    /* ── Options row ── */
+    .options-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+      margin-top: -4px;
+    }
+    .remember-label {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.8rem; color: var(--warm-gray);
+      cursor: pointer;
+    }
+    .remember-label input { accent-color: var(--accent); }
+    .forgot-link {
+      font-size: 0.75rem;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: 0.06em;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+    .forgot-link:hover { text-decoration: underline; }
+
+    /* ── Submit button ── */
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: var(--dark);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-submit:hover { background: var(--charcoal); }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-submit .spinner {
+      display: none;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto;
+    }
+    .btn-submit.loading .btn-text { display: none; }
+    .btn-submit.loading .spinner { display: block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Divider ── */
+    .divider {
+      display: flex; align-items: center;
+      gap: 14px; margin: 22px 0;
+      font-size: 0.75rem; color: var(--sand);
+      letter-spacing: 0.08em;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1;
+      height: 1px; background: var(--beige);
+    }
+
+    /* ── Social buttons ── */
+    .social-btns { display: flex; gap: 12px; }
+    .btn-social {
+      flex: 1; padding: 11px 14px;
+      border: 1px solid var(--beige);
+      border-radius: var(--radius);
+      background: white;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      font-family: var(--font-body); font-size: 0.82rem;
+      color: var(--dark); cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+    }
+    .btn-social:hover { border-color: var(--sand); background: var(--cream); }
+    .btn-social img { width: 18px; height: 18px; }
+
+    /* ── Alert ── */
+    .auth-alert {
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      font-size: 0.82rem;
+      margin-bottom: 18px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+    }
+    .auth-alert.show { display: flex; }
+    .auth-alert.error { background: #FEF2F2; color: #C0392B; border: 1px solid #FECACA; }
+    .auth-alert.success { background: #F0FDF4; color: #166534; border: 1px solid #BBF7D0; }
+
+    /* ── Toast ── */
+    .toast-container {
+      position: fixed; bottom: 24px; right: 24px;
+      display: flex; flex-direction: column; gap: 10px;
+      z-index: 9999;
+    }
+    .toast {
+      background: white;
+      border-radius: 8px;
+      padding: 14px 18px;
+      box-shadow: var(--shadow);
+      display: flex; align-items: center; gap: 12px;
+      font-size: 0.85rem;
+      animation: slideIn 0.3s ease;
+      min-width: 260px;
+    }
+    .toast svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .toast.success svg { color: #4A7C59; }
+    .toast.error svg { color: #C0392B; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    /* ── Mobile ── */
     @media (max-width: 768px) {
-      .auth-wrapper { grid-template-columns: 1fr; }
-      .auth-visual { display: none; }
-      .auth-panel { padding: 24px; }
+      body { overflow: auto; flex-direction: column; }
+      .left-panel { width: 100%; height: 220px; flex-shrink: 0; }
+      .right-panel { padding: 32px 24px; }
+      .field-row-2 { flex-direction: column; gap: 0; }
     }
   </style>
 </head>
 <body>
-<div class="auth-wrapper">
-  <!-- Visual Side -->
-  <div class="auth-visual">
-    <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1200&q=80" alt="Echo Furniture" onerror="this.parentElement.style.background='var(--beige)'">
-    <div class="auth-visual-overlay">
-      <a href="../index.html" class="navbar-logo" style="font-family:var(--font-display);font-size:1.8rem;color:white;margin-bottom:auto;">Echo<span style="color:var(--accent-light)">·</span>Furniture</a>
-      <p class="auth-visual-quote">"A home should reflect the people living in it."</p>
-      <p class="auth-visual-credit">— Echo Furniture Design Studio</p>
+
+  <!-- Left Panel -->
+  <div class="left-panel">
+    <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=900&q=80" alt="Echo Furniture" onerror="this.style.background='#2C2520'">
+    <div class="left-overlay">
+      <div class="left-logo">Echo<span>·</span>Furniture</div>
+      <div class="left-tagline">
+        <h2>Spaces where life unfolds beautifully.</h2>
+        <p>Premium handcrafted furniture,<br>delivered to your door with care.</p>
+      </div>
     </div>
   </div>
 
-  <!-- Auth Panel -->
-  <div class="auth-panel">
-    <a href="../index.html" class="auth-logo">Echo<span>·</span>Furniture</a>
+  <!-- Right Panel -->
+  <div class="right-panel">
+    <div class="auth-box">
 
-    <div class="auth-tabs">
-      <button class="auth-tab active" onclick="switchAuthTab('login')" id="loginTabBtn">Sign In</button>
-      <button class="auth-tab" onclick="switchAuthTab('register')" id="registerTabBtn">Create Account</button>
-    </div>
-
-    <!-- ── LOGIN FORM ── -->
-    <div id="loginForm" class="auth-form">
-      <h2 style="font-family:var(--font-display);font-size:2rem;font-weight:300;margin-bottom:6px;">Welcome back</h2>
-      <p style="font-size:0.9rem;color:var(--warm-gray);margin-bottom:28px;">Sign in to your Echo account</p>
-
-      <div class="form-group">
-        <label class="form-label">Email Address</label>
-        <input class="form-input" type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email">
+      <div class="auth-header">
+        <div class="auth-brand">Echo<span>·</span>Furniture</div>
+        <div class="tab-group">
+          <button class="tab-btn active" onclick="switchTab('signin')">Sign In</button>
+          <button class="tab-btn" onclick="switchTab('register')">Create Account</button>
+        </div>
       </div>
-      <div class="form-group">
-        <label class="form-label">
-          Password
-          <a href="#" style="float:right;font-size:0.78rem;color:var(--accent);font-weight:400;">Forgot password?</a>
-        </label>
-        <div class="password-wrap">
-          <input class="form-input" type="password" id="loginPassword" placeholder="Your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')handleLogin()">
-          <button class="password-toggle" onclick="togglePasswordVisibility('loginPassword', this)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+
+      <!-- Alert box -->
+      <div class="auth-alert" id="authAlert">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        <span id="authAlertMsg"></span>
+      </div>
+
+      <!-- ── SIGN IN FORM ── -->
+      <div class="auth-form active" id="signinForm">
+        <h2 class="form-title">Welcome back</h2>
+        <p class="form-subtitle">Sign in to your Echo account</p>
+
+        <div class="field-group">
+          <label class="field-label" for="signinEmail">Email Address</label>
+          <div class="field-row">
+            <input class="field-input" type="email" id="signinEmail" placeholder="you@example.com" autocomplete="email">
+          </div>
+          <div class="field-error" id="signinEmailErr">Please enter a valid email.</div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="signinPassword">Password</label>
+          <div class="field-row">
+            <input class="field-input" type="password" id="signinPassword" placeholder="Your password" autocomplete="current-password">
+            <button class="field-toggle" type="button" onclick="togglePass('signinPassword', this)" title="Show/hide">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="field-error" id="signinPassErr">Please enter your password.</div>
+        </div>
+
+        <div class="options-row">
+          <label class="remember-label">
+            <input type="checkbox" id="rememberMe"> Remember me for 30 days
+          </label>
+          <a href="#" class="forgot-link" onclick="showForgot(event)">Forgot Password?</a>
+        </div>
+
+        <button class="btn-submit" id="signinBtn" onclick="handleSignIn()">
+          <span class="btn-text">Sign In</span>
+          <div class="spinner"></div>
+        </button>
+
+        <div class="divider">or continue with</div>
+
+        <div class="social-btns">
+          <button class="btn-social" onclick="handleSocialLogin('google')">
+            <img src="https://www.google.com/favicon.ico" alt="Google"> Google
+          </button>
+          <button class="btn-social" onclick="handleSocialLogin('facebook')">
+            <img src="https://www.facebook.com/favicon.ico" alt="Facebook"> Facebook
           </button>
         </div>
       </div>
 
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
-        <input type="checkbox" id="rememberMe" style="accent-color:var(--accent);width:15px;height:15px;">
-        <label for="rememberMe" style="font-size:0.85rem;color:var(--charcoal);cursor:pointer;">Remember me for 30 days</label>
-      </div>
+      <!-- ── REGISTER FORM ── -->
+      <div class="auth-form" id="registerForm">
+        <h2 class="form-title">Create account</h2>
+        <p class="form-subtitle">Join Echo Furniture today</p>
 
-      <button class="btn btn-primary btn-block btn-lg" onclick="handleLogin()" id="loginBtn">Sign In</button>
-
-      <div class="divider-or">or continue with</div>
-      <div class="social-login">
-        <button class="social-btn" onclick="toast.info('Social login coming soon!')">
-          <svg viewBox="0 0 24 24" width="18" height="18"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-          Google
-        </button>
-        <button class="social-btn" onclick="toast.info('Social login coming soon!')">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-          Facebook
-        </button>
-      </div>
-
-      <p style="font-size:0.85rem;color:var(--warm-gray);margin-top:24px;text-align:center;">
-        Don't have an account? <button onclick="switchAuthTab('register')" style="color:var(--accent);font-size:0.85rem;text-decoration:underline;">Create one free</button>
-      </p>
-
-      <!-- Demo credentials -->
-      <div style="margin-top:20px;padding:14px;background:var(--cream);border-radius:8px;font-size:0.78rem;color:var(--warm-gray);">
-        <strong style="color:var(--charcoal);">Demo Accounts:</strong><br>
-        <span>Admin: admin@echofurniture.com / Admin@123</span><br>
-        <span>User: john@example.com / Admin@123</span>
-      </div>
-    </div>
-
-    <!-- ── REGISTER FORM ── -->
-    <div id="registerForm" class="auth-form" style="display:none;">
-      <h2 style="font-family:var(--font-display);font-size:2rem;font-weight:300;margin-bottom:6px;">Create account</h2>
-      <p style="font-size:0.9rem;color:var(--warm-gray);margin-bottom:28px;">Join 50,000+ happy Echo customers</p>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">First Name</label>
-          <input class="form-input" type="text" id="regFirstName" placeholder="First name">
+        <div class="field-row-2">
+          <div class="field-group">
+            <label class="field-label" for="regFirst">First Name</label>
+            <input class="field-input" type="text" id="regFirst" placeholder="Rahul" autocomplete="given-name">
+            <div class="field-error" id="regFirstErr">Required.</div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="regLast">Last Name</label>
+            <input class="field-input" type="text" id="regLast" placeholder="Sharma" autocomplete="family-name">
+            <div class="field-error" id="regLastErr">Required.</div>
+          </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Last Name</label>
-          <input class="form-input" type="text" id="regLastName" placeholder="Last name">
+
+        <div class="field-group">
+          <label class="field-label" for="regEmail">Email Address</label>
+          <input class="field-input" type="email" id="regEmail" placeholder="you@example.com" autocomplete="email">
+          <div class="field-error" id="regEmailErr">Please enter a valid email.</div>
         </div>
-      </div>
 
-      <div class="form-group">
-        <label class="form-label">Email Address</label>
-        <input class="form-input" type="email" id="regEmail" placeholder="you@example.com">
-      </div>
+        <div class="field-group">
+          <label class="field-label" for="regPhone">Phone Number</label>
+          <input class="field-input" type="tel" id="regPhone" placeholder="+91 98765 43210" autocomplete="tel">
+        </div>
 
-      <div class="form-group">
-        <label class="form-label">Phone Number</label>
-        <input class="form-input" type="tel" id="regPhone" placeholder="+91 98765 43210">
-      </div>
+        <div class="field-group">
+          <label class="field-label" for="regPassword">Password</label>
+          <div class="field-row">
+            <input class="field-input" type="password" id="regPassword" placeholder="Min. 8 characters" autocomplete="new-password">
+            <button class="field-toggle" type="button" onclick="togglePass('regPassword', this)" title="Show/hide">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="field-error" id="regPassErr">Password must be at least 8 characters.</div>
+        </div>
 
-      <div class="form-group">
-        <label class="form-label">Password</label>
-        <div class="password-wrap">
-          <input class="form-input" type="password" id="regPassword" placeholder="Minimum 6 characters" oninput="checkPasswordStrength(this.value)" onkeydown="if(event.key==='Enter')handleRegister()">
-          <button class="password-toggle" onclick="togglePasswordVisibility('regPassword', this)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        <div class="field-group">
+          <label class="field-label" for="regConfirm">Confirm Password</label>
+          <div class="field-row">
+            <input class="field-input" type="password" id="regConfirm" placeholder="Re-enter password" autocomplete="new-password">
+            <button class="field-toggle" type="button" onclick="togglePass('regConfirm', this)" title="Show/hide">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="field-error" id="regConfirmErr">Passwords do not match.</div>
+        </div>
+
+        <button class="btn-submit" id="registerBtn" onclick="handleRegister()">
+          <span class="btn-text">Create Account</span>
+          <div class="spinner"></div>
+        </button>
+
+        <div class="divider">or continue with</div>
+        <div class="social-btns">
+          <button class="btn-social" onclick="handleSocialLogin('google')">
+            <img src="https://www.google.com/favicon.ico" alt="Google"> Google
+          </button>
+          <button class="btn-social" onclick="handleSocialLogin('facebook')">
+            <img src="https://www.facebook.com/favicon.ico" alt="Facebook"> Facebook
           </button>
         </div>
-        <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
-        <div id="strengthLabel" style="font-size:0.72rem;color:var(--warm-gray);margin-top:3px;"></div>
       </div>
 
-      <button class="btn btn-primary btn-block btn-lg" onclick="handleRegister()" id="registerBtn">Create My Account</button>
-
-      <p class="terms-text">
-        By creating an account, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
-        We'll occasionally send you account-related emails.
-      </p>
-
-      <p style="font-size:0.85rem;color:var(--warm-gray);margin-top:20px;text-align:center;">
-        Already have an account? <button onclick="switchAuthTab('login')" style="color:var(--accent);font-size:0.85rem;text-decoration:underline;">Sign in instead</button>
-      </p>
     </div>
   </div>
-</div>
 
-<script src="../scripts/main.js"></script>
+  <!-- Toast container -->
+  <div class="toast-container" id="toastContainer"></div>
+
 <script>
-  // Redirect if already logged in
-  if (auth.isLoggedIn()) {
-    const redirect = new URLSearchParams(location.search).get('redirect') || '../index.html';
-    window.location.href = redirect;
+  // ── Tab switcher ──
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach((b, i) =>
+      b.classList.toggle('active', (i === 0) === (tab === 'signin'))
+    );
+    document.getElementById('signinForm').classList.toggle('active', tab === 'signin');
+    document.getElementById('registerForm').classList.toggle('active', tab === 'register');
+    hideAlert();
   }
 
-  function switchAuthTab(tab) {
-    const isLogin = tab === 'login';
-    document.getElementById('loginForm').style.display = isLogin ? 'block' : 'none';
-    document.getElementById('registerForm').style.display = isLogin ? 'none' : 'block';
-    document.getElementById('loginTabBtn').classList.toggle('active', isLogin);
-    document.getElementById('registerTabBtn').classList.toggle('active', !isLogin);
-  }
-
-  function togglePasswordVisibility(inputId, btn) {
-    const input = document.getElementById(inputId);
+  // ── Show/hide password ──
+  function togglePass(id, btn) {
+    const input = document.getElementById(id);
     const isText = input.type === 'text';
     input.type = isText ? 'password' : 'text';
     btn.innerHTML = isText
-      ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`
-      : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
+      ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`
+      : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
   }
 
-  function checkPasswordStrength(pwd) {
-    const fill = document.getElementById('strengthFill');
-    const label = document.getElementById('strengthLabel');
-    if (!pwd) { fill.style.width = '0'; label.textContent = ''; return; }
-
-    let score = 0;
-    if (pwd.length >= 6) score++;
-    if (pwd.length >= 10) score++;
-    if (/[A-Z]/.test(pwd)) score++;
-    if (/[0-9]/.test(pwd)) score++;
-    if (/[^A-Za-z0-9]/.test(pwd)) score++;
-
-    const levels = [
-      { w: '20%', bg: '#C0392B', text: 'Very Weak' },
-      { w: '40%', bg: '#E67E22', text: 'Weak' },
-      { w: '60%', bg: '#F39C12', text: 'Fair' },
-      { w: '80%', bg: '#27AE60', text: 'Strong' },
-      { w: '100%', bg: '#1E8449', text: 'Very Strong' }
-    ];
-    const level = levels[score - 1] || levels[0];
-    fill.style.width = level.w;
-    fill.style.background = level.bg;
-    label.textContent = level.text;
-    label.style.color = level.bg;
+  // ── Alert helpers ──
+  function showAlert(msg, type = 'error') {
+    const el = document.getElementById('authAlert');
+    document.getElementById('authAlertMsg').textContent = msg;
+    el.className = `auth-alert show ${type}`;
+  }
+  function hideAlert() {
+    document.getElementById('authAlert').classList.remove('show');
   }
 
-  async function handleLogin() {
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
-    if (!email || !password) { toast.error('Please fill in all fields'); return; }
+  // ── Toast ──
+  function showToast(msg, type = 'success') {
+    const icons = {
+      success: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>`,
+      error:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>`
+    };
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.innerHTML = `${icons[type]}<span>${msg}</span>`;
+    document.getElementById('toastContainer').appendChild(t);
+    setTimeout(() => t.remove(), 3500);
+  }
 
-    const btn = document.getElementById('loginBtn');
-    btn.classList.add('btn-loading'); btn.disabled = true;
+  // ── Validate ──
+  function validateEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+  function setError(id, show) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = show ? 'block' : 'none';
+  }
+  function markInput(id, error) {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('error', error);
+  }
+
+  // ── SIGN IN ──
+  async function handleSignIn() {
+    hideAlert();
+    const email    = document.getElementById('signinEmail').value.trim();
+    const password = document.getElementById('signinPassword').value;
+
+    let valid = true;
+    if (!validateEmail(email)) { markInput('signinEmail', true); setError('signinEmailErr', true); valid = false; }
+    else { markInput('signinEmail', false); setError('signinEmailErr', false); }
+    if (!password) { markInput('signinPassword', true); setError('signinPassErr', true); valid = false; }
+    else { markInput('signinPassword', false); setError('signinPassErr', false); }
+    if (!valid) return;
+
+    const btn = document.getElementById('signinBtn');
+    btn.classList.add('loading'); btn.disabled = true;
 
     try {
-      const data = await api.post('/auth/login', { email, password });
-      auth.login(data.token, data.user);
-      toast.success(data.message || 'Logged in successfully!');
-      const redirect = new URLSearchParams(location.search).get('redirect') || '../index.html';
-      setTimeout(() => { window.location.href = redirect; }, 800);
+      const res = await fetch('https://echo-furniture.onrender.com/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.message || 'Invalid email or password.');
+
+      // Save auth
+      localStorage.setItem('echo_token', data.token);
+      localStorage.setItem('echo_user', JSON.stringify(data.user));
+
+      showToast('Welcome back! Redirecting…');
+      const redirect = new URLSearchParams(window.location.search).get('redirect');
+      setTimeout(() => {
+        window.location.href = redirect || '../index.html';
+      }, 1000);
+
     } catch (err) {
-      toast.error(err.message || 'Login failed');
-      btn.classList.remove('btn-loading'); btn.disabled = false;
+      showAlert(err.message || 'Sign in failed. Please try again.');
+    } finally {
+      btn.classList.remove('loading'); btn.disabled = false;
     }
   }
 
+  // ── REGISTER ──
   async function handleRegister() {
-    const first_name = document.getElementById('regFirstName').value.trim();
-    const last_name = document.getElementById('regLastName').value.trim();
-    const email = document.getElementById('regEmail').value.trim();
-    const phone = document.getElementById('regPhone').value.trim();
-    const password = document.getElementById('regPassword').value;
+    hideAlert();
+    const first   = document.getElementById('regFirst').value.trim();
+    const last    = document.getElementById('regLast').value.trim();
+    const email   = document.getElementById('regEmail').value.trim();
+    const phone   = document.getElementById('regPhone').value.trim();
+    const pass    = document.getElementById('regPassword').value;
+    const confirm = document.getElementById('regConfirm').value;
 
-    if (!first_name || !last_name || !email || !password) { toast.error('Please fill in all required fields'); return; }
-    if (password.length < 6) { toast.error('Password must be at least 6 characters'); return; }
+    let valid = true;
+    if (!first)                 { markInput('regFirst',   true); setError('regFirstErr',   true); valid = false; } else { markInput('regFirst',   false); setError('regFirstErr',   false); }
+    if (!last)                  { markInput('regLast',    true); setError('regLastErr',    true); valid = false; } else { markInput('regLast',    false); setError('regLastErr',    false); }
+    if (!validateEmail(email))  { markInput('regEmail',   true); setError('regEmailErr',   true); valid = false; } else { markInput('regEmail',   false); setError('regEmailErr',   false); }
+    if (pass.length < 8)        { markInput('regPassword',true); setError('regPassErr',    true); valid = false; } else { markInput('regPassword',false); setError('regPassErr',    false); }
+    if (pass !== confirm)       { markInput('regConfirm', true); setError('regConfirmErr', true); valid = false; } else { markInput('regConfirm', false); setError('regConfirmErr', false); }
+    if (!valid) return;
 
     const btn = document.getElementById('registerBtn');
-    btn.classList.add('btn-loading'); btn.disabled = true;
+    btn.classList.add('loading'); btn.disabled = true;
 
     try {
-      const data = await api.post('/auth/register', { first_name, last_name, email, password, phone });
-      auth.login(data.token, data.user);
-      toast.success(data.message || 'Account created!');
-      setTimeout(() => { window.location.href = '../index.html'; }, 800);
+      const res = await fetch('https://echo-furniture.onrender.com/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ first_name: first, last_name: last, email, phone, password: pass })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Registration failed.');
+
+      // Save auth
+      localStorage.setItem('echo_token', data.token);
+      localStorage.setItem('echo_user', JSON.stringify(data.user));
+
+      // Send welcome email notification to owner
+      await notifyOwner('new_user', { name: `${first} ${last}`, email, phone });
+
+      showToast('Account created! Welcome to Echo Furniture 🎉');
+      setTimeout(() => { window.location.href = '../index.html'; }, 1200);
+
     } catch (err) {
-      toast.error(err.message || 'Registration failed');
-      btn.classList.remove('btn-loading'); btn.disabled = false;
+      showAlert(err.message || 'Registration failed. Please try again.');
+    } finally {
+      btn.classList.remove('loading'); btn.disabled = false;
     }
   }
 
-  // Check if URL has tab param
-  if (new URLSearchParams(location.search).get('tab') === 'register') {
-    switchAuthTab('register');
+  // ── Notify owner via EmailJS (free) ──
+  // To activate: sign up at emailjs.com, create a service + template, paste IDs below
+  const OWNER_EMAIL    = 'bodepudibuela@gmail.com';
+  const EMAILJS_SVC    = 'YOUR_EMAILJS_SERVICE_ID';   // ← replace
+  const EMAILJS_TMPL   = 'YOUR_EMAILJS_TEMPLATE_ID';  // ← replace
+  const EMAILJS_KEY    = 'YOUR_EMAILJS_PUBLIC_KEY';   // ← replace
+
+  async function notifyOwner(type, details) {
+    // Only runs if EmailJS IDs are configured
+    if (EMAILJS_SVC.startsWith('YOUR_')) return;
+    try {
+      await fetch(`https://api.emailjs.com/api/v1.0/email/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          service_id:  EMAILJS_SVC,
+          template_id: EMAILJS_TMPL,
+          user_id:     EMAILJS_KEY,
+          template_params: {
+            to_email: OWNER_EMAIL,
+            event:    type === 'new_user' ? 'New Registration' : 'New Order',
+            details:  JSON.stringify(details, null, 2)
+          }
+        })
+      });
+    } catch (e) { console.log('Email notify skipped:', e); }
   }
+
+  // ── Social login placeholder ──
+  function handleSocialLogin(provider) {
+    showToast(`${provider.charAt(0).toUpperCase() + provider.slice(1)} login coming soon!`, 'error');
+  }
+
+  // ── Forgot password ──
+  function showForgot(e) {
+    e.preventDefault();
+    const email = document.getElementById('signinEmail').value.trim();
+    if (!validateEmail(email)) {
+      showAlert('Enter your email address above first, then click Forgot Password.');
+      return;
+    }
+    showAlert(`Password reset link sent to ${email}. Check your inbox.`, 'success');
+  }
+
+  // ── Enter key support ──
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter') return;
+    if (document.getElementById('signinForm').classList.contains('active')) handleSignIn();
+    else handleRegister();
+  });
 </script>
+
+<!--
+=============================================================
+  ORDER EMAIL SETUP (3 easy steps — free)
+=============================================================
+  Orders from checkout need to email you at: bodepudibuela@gmail.com
+  Use EmailJS (free, no server needed):
+
+  1. Sign up at https://www.emailjs.com (free)
+  2. Add your Gmail as a service → get SERVICE_ID
+  3. Create an email template → get TEMPLATE_ID + PUBLIC_KEY
+  4. Paste those 3 IDs in this file (lines with YOUR_EMAILJS_*)
+  5. In your checkout.html, call notifyOwner('new_order', orderDetails)
+     after a successful order placement.
+
+  Template variables to use in EmailJS:
+    {{to_email}}  → bodepudibuela@gmail.com
+    {{event}}     → "New Order"
+    {{details}}   → order JSON
+=============================================================
+-->
 </body>
 </html>
