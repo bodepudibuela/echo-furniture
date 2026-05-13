@@ -7,6 +7,40 @@
   <link rel="stylesheet" href="../styles/main.css" />
   <style>
     body { background: var(--cream); }
+
+    /* ── Fix: btn-loading spinner (missing from main.css) ── */
+    .btn-loading {
+      position: relative;
+      color: transparent !important;
+      pointer-events: none;
+    }
+    .btn-loading::after {
+      content: '';
+      position: absolute;
+      width: 18px; height: 18px;
+      top: 50%; left: 50%;
+      margin: -9px 0 0 -9px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Backend status banner ── */
+    .backend-notice {
+      background: #FFF8E1;
+      border: 1px solid #FFE082;
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 0.78rem;
+      color: #7B5E00;
+      margin-bottom: 18px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+    .backend-notice.show { display: flex; }
     .auth-wrapper {
       min-height: 100vh;
       display: grid;
@@ -130,6 +164,11 @@
       <h2 style="font-family:var(--font-display);font-size:2rem;font-weight:300;margin-bottom:6px;">Welcome back</h2>
       <p style="font-size:0.9rem;color:var(--warm-gray);margin-bottom:28px;">Sign in to your Echo account</p>
 
+      <!-- Backend status notice -->
+      <div class="backend-notice" id="backendNotice">
+        ⏳ Server is waking up (Render free tier sleeps). Please wait 20–30 seconds and try again.
+      </div>
+
       <div class="form-group">
         <label class="form-label">Email Address</label>
         <input class="form-input" type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email">
@@ -232,6 +271,10 @@
 
 <script src="../scripts/main.js"></script>
 <script>
+  // ── Wake up Render backend on page load ──
+  const API_URL = 'https://echo-furniture.onrender.com/api';
+  fetch(API_URL + '/categories').catch(() => {});
+
   // Redirect if already logged in
   if (auth.isLoggedIn()) {
     const redirect = new URLSearchParams(location.search).get('redirect') || '../index.html';
@@ -288,6 +331,7 @@
 
     const btn = document.getElementById('loginBtn');
     btn.classList.add('btn-loading'); btn.disabled = true;
+    document.getElementById('backendNotice').classList.remove('show');
 
     try {
       const data = await api.post('/auth/login', { email, password });
@@ -296,7 +340,13 @@
       const redirect = new URLSearchParams(location.search).get('redirect') || '../index.html';
       setTimeout(() => { window.location.href = redirect; }, 800);
     } catch (err) {
-      toast.error(err.message || 'Login failed');
+      const msg = err.message || '';
+      if (msg.includes('fetch') || msg.includes('network') || msg.toLowerCase().includes('failed')) {
+        document.getElementById('backendNotice').classList.add('show');
+        toast.error('Server is starting up. Please wait 30 seconds and try again.');
+      } else {
+        toast.error(msg || 'Incorrect email or password.');
+      }
       btn.classList.remove('btn-loading'); btn.disabled = false;
     }
   }
@@ -317,10 +367,17 @@
     try {
       const data = await api.post('/auth/register', { first_name, last_name, email, password, phone });
       auth.login(data.token, data.user);
-      toast.success(data.message || 'Account created!');
+      toast.success(data.message || 'Account created! Welcome to Echo Furniture 🎉');
       setTimeout(() => { window.location.href = '../index.html'; }, 800);
     } catch (err) {
-      toast.error(err.message || 'Registration failed');
+      const msg = err.message || '';
+      if (msg.includes('fetch') || msg.includes('network') || msg.toLowerCase().includes('failed')) {
+        toast.error('Server is starting up. Please wait 30 seconds and try again.');
+      } else if (msg.toLowerCase().includes('exist') || msg.toLowerCase().includes('duplicate')) {
+        toast.error('An account with this email already exists. Try signing in instead.');
+      } else {
+        toast.error(msg || 'Registration failed. Please try again.');
+      }
       btn.classList.remove('btn-loading'); btn.disabled = false;
     }
   }
