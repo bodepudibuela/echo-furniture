@@ -15,6 +15,90 @@
     .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.4); transition: all 0.3s; cursor: pointer; }
     .dot.active { background: var(--accent); width: 24px; border-radius: 4px; }
 
+    /* ── Hero Slide Base ── */
+    .hero-slide {
+      width: 100%; min-height: 100vh;
+      align-items: center;
+      padding-top: var(--nav-height);
+      position: relative; overflow: hidden;
+    }
+    .hero-slide.active { display: flex; }
+    .slide-cream { background: var(--cream); }
+    .slide-dark { background: linear-gradient(135deg,#2C2520 0%,#3D3530 100%); }
+
+    /* ── Slide image panels ── */
+    .slide-img-right {
+      position: absolute; right: 0; top: 0;
+      width: 52%; height: 100%; z-index: 0;
+    }
+    .slide-img-right img { width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
+    .slide-bg-shape {
+      position: absolute; right:-5%; top:-5%;
+      width:100%; height:110%;
+      background: var(--beige);
+      clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
+      z-index: -1;
+    }
+    .slide-img-left {
+      position: absolute; left: 0; top: 0;
+      width: 52%; height: 100%; z-index: 0;
+    }
+    .slide-img-left img { width:100%; height:100%; object-fit:cover; display:block; }
+
+    /* ── Slide 2 fullscreen bg image ── */
+    .slide-bg-img {
+      position: absolute; inset: 0;
+      width:100%; height:100%; object-fit:cover; opacity:0.3; z-index:0;
+    }
+
+    /* ── Slide containers ── */
+    .slide-container { position: relative; z-index: 1; width: 100%; }
+    .slide-container-right { display: flex; justify-content: flex-end; }
+    .hero-content-right { text-align: right; align-items: flex-end; max-width: 540px; }
+    .hero-desc-right { margin-left: auto; }
+    .hero-cta-right { justify-content: flex-end; }
+
+    /* ── Light text variants for dark slide ── */
+    .hero-tag-light { color: var(--accent-light) !important; border-color: var(--accent-light) !important; }
+    .hero-title-light { color: white !important; }
+    .hero-desc-light { color: rgba(255,255,255,0.65) !important; }
+    .hero-outline-light { color: white !important; border-color: rgba(255,255,255,0.4) !important; }
+
+    /* ── MOBILE: hero fixes ── */
+    @media (max-width: 768px) {
+      .hero-slide {
+        flex-direction: column !important;
+        min-height: 100svh;
+        align-items: flex-start;
+      }
+      .slide-img-right,
+      .slide-img-left {
+        position: relative !important;
+        width: 100% !important;
+        height: 56vw !important;
+        min-height: 200px;
+        max-height: 300px;
+        order: -1;
+      }
+      .slide-bg-shape { display: none; }
+      .slide-container { padding: 24px 0 60px; }
+      .slide-container-right { justify-content: flex-start; }
+      .hero-content-right { text-align: left; align-items: flex-start; max-width: 100%; }
+      .hero-desc-right { margin-left: 0; }
+      .hero-cta-right { justify-content: flex-start; }
+      .hero-title { font-size: clamp(2rem, 8vw, 3rem) !important; }
+      .hero-description { font-size: 0.9rem; margin-bottom: 24px; }
+      .hero-cta { margin-bottom: 32px; }
+      .hero-stats { gap: 20px; }
+      .stat-number { font-size: 1.5rem; }
+      .slider-dots { bottom: 16px; }
+    }
+
+    @media (max-width: 480px) {
+      .slide-img-right,
+      .slide-img-left { height: 65vw !important; max-height: 260px; }
+    }
+
     /* ── Featured Banner ── */
     .promo-banner {
       background: var(--dark);
@@ -130,12 +214,12 @@
        ============================================================ -->
   <section class="hero hero-slider">
     <!-- Slide 1 -->
-    <div class="hero-slide active" style="width:100%;min-height:100vh;display:flex;align-items:center;background:var(--cream);padding-top:var(--nav-height);position:relative;overflow:hidden;">
-      <div style="position:absolute;right:0;top:0;width:52%;height:100%;z-index:0;">
-        <div style="position:absolute;right:-5%;top:-5%;width:100%;height:110%;background:var(--beige);clip-path:polygon(15% 0, 100% 0, 100% 100%, 0% 100%);z-index:-1;"></div>
-        <img src="https://picsum.photos/id/116/1200/800" alt="Milano Sofa" style="width:100%;height:100%;object-fit:cover;object-position:center;" onerror="this.style.background='#c8b89a'">
+    <div class="hero-slide active slide-cream">
+      <div class="slide-img-right">
+        <div class="slide-bg-shape"></div>
+        <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1200&q=80" alt="Milano Sofa" onerror="this.style.background='#c8b89a'">
       </div>
-      <div class="container" style="position:relative;z-index:1;width:100%;">
+      <div class="container slide-container">
         <div class="hero-content">
           <div class="hero-tag">New Collection 2024</div>
           <h1 class="hero-title">Where <em>Comfort</em><br>Meets Craft</h1>
@@ -159,16 +243,16 @@
     </div>
 
     <!-- Slide 2 -->
-    <div class="hero-slide" style="width:100%;min-height:100vh;display:none;align-items:center;background:linear-gradient(135deg,#2C2520 0%,#3D3530 100%);padding-top:var(--nav-height);position:relative;overflow:hidden;">
-      <img src="https://images.unsplash.com/photo-1505693314120-0d443867891c?w=1400&q=80" alt="Bedroom" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.3;">
-      <div class="container" style="position:relative;z-index:1;width:100%;">
-        <div class="hero-content" style="max-width:640px;">
-          <div class="hero-tag" style="color:var(--accent-light);border-color:var(--accent-light)">Bedroom Collection</div>
-          <h1 class="hero-title" style="color:white">Sleep in<br><em>Pure Luxury</em></h1>
-          <p class="hero-description" style="color:rgba(255,255,255,0.65)">Premium beds and bedroom furniture crafted for the deepest rest. Wake up to beauty, every morning.</p>
+    <div class="hero-slide slide-dark">
+      <img class="slide-bg-img" src="https://images.unsplash.com/photo-1505693314120-0d443867891c?w=1400&q=80" alt="Bedroom">
+      <div class="container slide-container">
+        <div class="hero-content">
+          <div class="hero-tag hero-tag-light">Bedroom Collection</div>
+          <h1 class="hero-title hero-title-light">Sleep in<br><em>Pure Luxury</em></h1>
+          <p class="hero-description hero-desc-light">Premium beds and bedroom furniture crafted for the deepest rest. Wake up to beauty, every morning.</p>
           <div class="hero-cta">
             <a href="./pages/products.html?category=beds" class="btn btn-accent btn-lg">Shop Bedroom</a>
-            <a href="./pages/products.html" class="btn btn-outline btn-lg" style="color:white;border-color:rgba(255,255,255,0.4)">View All</a>
+            <a href="./pages/products.html" class="btn btn-outline btn-lg hero-outline-light">View All</a>
           </div>
         </div>
       </div>
@@ -180,16 +264,16 @@
     </div>
 
     <!-- Slide 3 -->
-    <div class="hero-slide" style="width:100%;min-height:100vh;display:none;align-items:center;background:var(--cream);padding-top:var(--nav-height);position:relative;overflow:hidden;">
-      <div style="position:absolute;left:0;top:0;width:52%;height:100%;">
-        <img src="https://picsum.photos/id/furniture/1200/800" alt="Office" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.background='#c8b89a'">
+    <div class="hero-slide slide-cream">
+      <div class="slide-img-left">
+        <img src="https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=1200&q=80" alt="Office" onerror="this.style.background='#c8b89a'">
       </div>
-      <div class="container" style="position:relative;z-index:1;width:100%;display:flex;justify-content:flex-end;">
-        <div class="hero-content" style="text-align:right;align-items:flex-end;max-width:540px;">
+      <div class="container slide-container slide-container-right">
+        <div class="hero-content hero-content-right">
           <div class="hero-tag">Work From Home</div>
           <h1 class="hero-title">Your Perfect<br><em>Workspace</em></h1>
-          <p class="hero-description" style="margin-left:auto">Ergonomic and elegant office furniture for the modern professional. Work smarter, not harder.</p>
-          <div class="hero-cta" style="justify-content:flex-end;">
+          <p class="hero-description hero-desc-right">Ergonomic and elegant office furniture for the modern professional. Work smarter, not harder.</p>
+          <div class="hero-cta hero-cta-right">
             <a href="./pages/products.html?category=office-furniture" class="btn btn-primary btn-lg">Shop Office</a>
           </div>
         </div>
